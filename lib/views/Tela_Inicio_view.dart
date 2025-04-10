@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sa06_3telas/views/tela_tarefas_view.dart';
 
 // Widget principal do app
 class MyApp extends StatelessWidget {
@@ -39,10 +40,9 @@ class _TelaInicioState extends State<TelaInicioView> {
 
       // Aguarda 1 segundo e navega para a próxima tela
       Future.delayed(Duration(seconds: 1), () {
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(builder: (context) => HomePage(nomeUsuario: _nome)),
-        );
+          "/tarefas");
       });
     } else {
       // Se o formulário estiver inválido ou os termos não forem aceitos
@@ -156,8 +156,7 @@ class _TelaInicioState extends State<TelaInicioView> {
                           ),
                           // Botão para login (redireciona usando rotas nomeadas)
                           ElevatedButton.icon(
-                            onPressed:
-                                () => Navigator.pushNamed(context, "/tarefas"),
+                            onPressed: _enviarFormulario,
                             icon: Icon(Icons.login),
                             label: Text("Entrar"),
                             style: ElevatedButton.styleFrom(
@@ -173,23 +172,6 @@ class _TelaInicioState extends State<TelaInicioView> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Página de destino após o login
-class HomePage extends StatelessWidget {
-  final String nomeUsuario;
-
-  const HomePage({required this.nomeUsuario});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // Aqui você pode montar sua home ou redirecionar para a tela de tarefas
-      body: Center(
-        child: Text("Bem-vindo, $nomeUsuario!", style: TextStyle(fontSize: 24)),
       ),
     );
   }

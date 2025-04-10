@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
-// Componente de tela principal da lista de tarefas
+/// Tela principal que exibe a lista de tarefas
 class TaskListPage extends StatefulWidget {
   @override
   _TaskListPageState createState() => _TaskListPageState();
 }
 
-// Estado da tela de tarefas
+/// Estado da tela TaskListPage (controla mudanças e atualizações)
 class _TaskListPageState extends State<TaskListPage> {
-  // Controlador do campo de texto para adicionar nova tarefa
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller =
+      TextEditingController(); // Controlador do campo de texto
 
-  // Lista inicial de tarefas
+  // Lista de tarefas
   List<Task> tasks = [
     Task(title: 'Estudar para a prova'),
     Task(title: 'Comprar mantimentos'),
     Task(title: 'Lavar o carro'),
   ];
 
-  // Função para adicionar uma nova tarefa à lista
+  /// Função para adicionar nova tarefa
   void _addTask() {
     if (_controller.text.isNotEmpty) {
       setState(() {
@@ -28,54 +28,77 @@ class _TaskListPageState extends State<TaskListPage> {
     }
   }
 
-  // Função para marcar/desmarcar uma tarefa como concluída
+  /// Alterna entre tarefa concluída e não concluída
   void _toggleTaskCompletion(Task task) {
     setState(() {
-      task.isCompleted = !task.isCompleted; // Inverte o status de conclusão
+      task.isCompleted = !task.isCompleted; // Inverte o estado da tarefa
     });
   }
 
-  // Função para remover uma tarefa da lista
+  /// Remove a tarefa da lista
   void _removeTask(Task task) {
     setState(() {
-      tasks.remove(task); // Remove a tarefa da lista
+      tasks.remove(task);
     });
   }
 
-  // Índice selecionado da BottomNavigationBar
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; // Aba selecionada
 
-  // Função chamada ao tocar em um item da BottomNavigationBar
+  /// Controla o clique nas abas do BottomNavigationBar
   void _onBottomNavTap(int index) {
     setState(() {
-      _selectedIndex = index; // Atualiza o índice selecionado
+      _selectedIndex = index;
     });
 
     switch (index) {
-      case 0:
-        break; // já estamos na tela de tarefas
       case 1:
-        Navigator.pushNamed(context, '/resumo'); // Navega para a tela de resumo
+        Navigator.pushNamed(context, '/resumo'); // Vai para a aba Resumo
         break;
       case 2:
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Tela de configurações em construção')),
-        ); // Mostra mensagem para configurações
+        );
         break;
     }
   }
 
+  /// Função para construir cada item da tarefa
+  Widget _buildTaskTile(Task task) {
+    return ListTile(
+      leading: IconButton(
+        icon: Icon(
+          task.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+          color: task.isCompleted ? Colors.green : Colors.grey,
+        ),
+        onPressed: () => _toggleTaskCompletion(task),
+      ),
+      title: Text(
+        task.title,
+        style: TextStyle(
+          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+          color: task.isCompleted ? Colors.grey : Colors.black,
+        ),
+      ),
+      trailing: IconButton(
+        icon: Icon(Icons.delete, color: Colors.red),
+        onPressed: () => _removeTask(task),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Divide tarefas em concluídas e não concluídas
+    final incompletas = tasks.where((task) => !task.isCompleted).toList();
+    final completas = tasks.where((task) => task.isCompleted).toList();
+
     return Scaffold(
-      // AppBar no topo da tela
       appBar: AppBar(
         title: Text('Minha Lista de Tarefas'),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications), // Ícone de notificações
+            icon: Icon(Icons.notifications),
             onPressed: () {
-              // Mostra mensagem de notificação
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Nenhuma nova notificação')),
               );
@@ -83,131 +106,127 @@ class _TaskListPageState extends State<TaskListPage> {
           ),
         ],
       ),
-      // Drawer (menu lateral esquerdo)
+
+      // Drawer (menu lateral)
       drawer: Drawer(
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue), // Fundo azul
+              decoration: BoxDecoration(color: Colors.blue),
               child: Text(
                 'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ), // Título do menu
+                style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            // Item: Dashboard
             ListTile(
               leading: Icon(Icons.dashboard),
               title: Text('Dashboard'),
               onTap: () {
-                Navigator.pop(context); // Fecha o menu
-                Navigator.pushNamed(context, '/resumo'); // Vai para resumo
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/resumo');
               },
             ),
-            // Item: Configurações
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Configurações'),
               onTap: () {
-                Navigator.pop(context); // Fecha o menu
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Configurações em construção')),
-                ); // Mostra aviso
+                );
               },
             ),
-            // Item: Ajuda
             ListTile(
               leading: Icon(Icons.help),
               title: Text('Ajuda'),
               onTap: () {
-                Navigator.pop(context); // Fecha o menu
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Central de ajuda em breve')),
-                ); // Mostra aviso
+                );
               },
             ),
           ],
         ),
       ),
-      // Corpo principal da tela
+
+      // Corpo principal com as listas
       body: Padding(
-        padding: const EdgeInsets.all(16.0), // Espaçamento interno
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: tasks.length, // Quantidade de tarefas
-                itemBuilder: (context, index) {
-                  final task = tasks[index]; // Tarefa atual
-                  return ListTile(
-                    // Ícone de status da tarefa
-                    leading: IconButton(
-                      icon: Icon(
-                        task.isCompleted
-                            ? Icons
-                                .check_circle // Ícone de concluído
-                            : Icons.radio_button_unchecked, // Ícone de pendente
-                        color: task.isCompleted ? Colors.green : Colors.grey,
-                      ),
-                      onPressed:
-                          () => _toggleTaskCompletion(task), // Alterna status
-                    ),
-                    // Título da tarefa
-                    title: Text(
-                      task.title,
-                      style: TextStyle(
-                        decoration:
-                            task.isCompleted
-                                ? TextDecoration
-                                    .lineThrough // Riscado se concluída
-                                : null,
-                        color:
-                            task.isCompleted
-                                ? Colors.grey
-                                : Colors.black, // Cor diferente
-                      ),
-                    ),
-                    // Botão de deletar tarefa
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => _removeTask(task), // Remove a tarefa
-                    ),
-                  );
-                },
+            // Container para tarefas pendentes
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.orange),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Tarefas Pendentes",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  ...incompletas
+                      .map(_buildTaskTile)
+                      .toList(), // Lista de tarefas não concluídas
+                ],
               ),
             ),
-            // Campo de texto + botão para adicionar tarefa
+            SizedBox(height: 16),
+
+            // Container para tarefas concluídas
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.green),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Tarefas Concluídas",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  ...completas
+                      .map(_buildTaskTile)
+                      .toList(), // Lista de tarefas concluídas
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Campo de adicionar nova tarefa
             Row(
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _controller, // Controlador do campo
+                    controller: _controller,
                     decoration: InputDecoration(
-                      hintText: 'Adicionar nova tarefa', // Texto de dica
-                      border: OutlineInputBorder(), // Borda do campo
+                      hintText: 'Adicionar nova tarefa',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.add), // Ícone de adicionar
-                  onPressed: _addTask, // Chama função para adicionar
+                  icon: Icon(Icons.add),
+                  onPressed: _addTask, // Adiciona a tarefa
                 ),
               ],
             ),
           ],
         ),
       ),
-      // Barra de navegação inferior
+
+      // Barra inferior com navegação
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex, // Índice atual selecionado
-        onTap: _onBottomNavTap, // Função ao tocar em item
+        currentIndex: _selectedIndex,
+        onTap: _onBottomNavTap,
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Tarefas', // Aba atual
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Tarefas'),
           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Resumo'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -219,11 +238,10 @@ class _TaskListPageState extends State<TaskListPage> {
   }
 }
 
-// Classe que representa uma Tarefa
+/// Modelo de dados da tarefa
 class Task {
-  String title; // Título da tarefa
-  bool isCompleted; // Status de conclusão
+  String title;
+  bool isCompleted;
 
-  // Construtor da classe Task
   Task({required this.title, this.isCompleted = false});
 }
