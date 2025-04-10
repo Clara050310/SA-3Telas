@@ -36,7 +36,7 @@ class TaskInfoScreen extends StatelessWidget {
                 ),
                 TaskSummaryCard(
                   title: 'Total de Tarefas',
-                  count: 8,
+                  count: 9,
                   color: Colors.blue,
                 ),
               ],

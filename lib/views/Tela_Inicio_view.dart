@@ -1,26 +1,51 @@
 import 'package:flutter/material.dart';
 
+// Widget principal do app
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tela de Login',
+      debugShowCheckedModeBanner: false, // Remove a faixa de debug
+      home: TelaInicioView(), // Define a tela inicial
+    );
+  }
+}
+
+// Tela de login com estado
 class TelaInicioView extends StatefulWidget {
   @override
   _TelaInicioState createState() => _TelaInicioState();
 }
 
 class _TelaInicioState extends State<TelaInicioView> {
-  final _formKey = GlobalKey<FormState>();
-  String _nome = "";
-  String _senha = "";
-  bool _aceite = false;
+  final _formKey = GlobalKey<FormState>(); // Chave para controlar o formulário
+  String _nome = ""; // Armazena o nome do usuário
+  String _senha = ""; // Armazena a senha
+  bool _aceite = false; // Indica se o usuário aceitou os termos
 
+  // Função para validar e enviar o formulário
   void _enviarFormulario() {
     if (_formKey.currentState!.validate() && _aceite) {
-      _formKey.currentState!.save();
+      _formKey.currentState!.save(); // Salva os dados do formulário
+
+      // Mostra uma mensagem de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Login realizado com sucesso!"),
           backgroundColor: Colors.green,
         ),
       );
+
+      // Aguarda 1 segundo e navega para a próxima tela
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage(nomeUsuario: _nome)),
+        );
+      });
     } else {
+      // Se o formulário estiver inválido ou os termos não forem aceitos
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -36,6 +61,7 @@ class _TelaInicioState extends State<TelaInicioView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        // Fundo com degradê azul
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.blue.shade900, Colors.blue.shade300],
@@ -47,25 +73,25 @@ class _TelaInicioState extends State<TelaInicioView> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Card(
-              elevation: 8,
+              elevation: 8, // Sombra do card
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(15), // Borda arredondada
               ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Form(
-                  key: _formKey,
+                  key: _formKey, // Atribui a chave ao formulário
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Ícone superior como botão
+                      // Ícone no topo do card
                       IconButton(
                         icon: Icon(Icons.person, size: 50, color: Colors.blue),
                         onPressed: () {},
                       ),
                       SizedBox(height: 20),
 
-                      // Campo Nome com IconButton
+                      // Campo de nome do usuário
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: "Digite seu Nome",
@@ -84,9 +110,9 @@ class _TelaInicioState extends State<TelaInicioView> {
                       ),
                       SizedBox(height: 15),
 
-                      // Campo Senha com IconButton
+                      // Campo de senha
                       TextFormField(
-                        obscureText: true,
+                        obscureText: true, // Oculta os caracteres da senha
                         decoration: InputDecoration(
                           labelText: "Insira uma Senha",
                           border: OutlineInputBorder(
@@ -106,7 +132,7 @@ class _TelaInicioState extends State<TelaInicioView> {
                       ),
                       SizedBox(height: 15),
 
-                      // Aceite os termos
+                      // Checkbox de aceite dos termos
                       CheckboxListTile(
                         value: _aceite,
                         title: Text("Aceito os Termos de Uso"),
@@ -115,48 +141,27 @@ class _TelaInicioState extends State<TelaInicioView> {
                       ),
                       SizedBox(height: 10),
 
-                      // Botões de Ação com IconButton
+                      // Botões de ação
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white),
+                          // Botão para voltar
+                          ElevatedButton.icon(
                             onPressed: () => Navigator.pop(context),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.grey[600],
-                              ),
-                              padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 15,
-                                ),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
+                            icon: Icon(Icons.arrow_back),
+                            label: Text("Voltar"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[600],
                             ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.login, color: Colors.white),
-                            onPressed: _enviarFormulario,
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.blue,
-                              ),
-                              padding: MaterialStateProperty.all(
-                                EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 15,
-                                ),
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
+                          // Botão para login (redireciona usando rotas nomeadas)
+                          ElevatedButton.icon(
+                            onPressed:
+                                () => Navigator.pushNamed(context, "/tarefas"),
+                            icon: Icon(Icons.login),
+                            label: Text("Entrar"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
                             ),
                           ),
                         ],
@@ -168,6 +173,23 @@ class _TelaInicioState extends State<TelaInicioView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Página de destino após o login
+class HomePage extends StatelessWidget {
+  final String nomeUsuario;
+
+  const HomePage({required this.nomeUsuario});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Aqui você pode montar sua home ou redirecionar para a tela de tarefas
+      body: Center(
+        child: Text("Bem-vindo, $nomeUsuario!", style: TextStyle(fontSize: 24)),
       ),
     );
   }
